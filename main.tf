@@ -15,10 +15,10 @@ provider "aws" {
   region = "us-east-1"
 }
 
-# 1. CloudWatch Log Group - FAIL (retention_in_days = 0)
+# 1. CloudWatch Log Group - FAIL (retention_in_days omitted => null)
 resource "aws_cloudwatch_log_group" "bad_logs" {
-  name              = "bad-log-group"
-  retention_in_days = 0
+  name = "bad-log-group"
+  # retention_in_days intentionally omitted
 }
 
 # 2. CloudFront Distribution with S3 origin - FAIL (no origin_access_identity)
@@ -95,7 +95,7 @@ resource "aws_redshift_cluster" "bad_cluster" {
   automated_snapshot_retention_period = 1       # FAIL
 }
 
-# 5. CloudWatch Alarm - FAIL (no alarm_actions set)
+# 5. CloudWatch Alarm - FAIL (all actions empty => IsEmpty)
 resource "aws_cloudwatch_metric_alarm" "bad_alarm" {
   alarm_name          = "bad-alarm"
   comparison_operator = "GreaterThanThreshold"
@@ -106,5 +106,7 @@ resource "aws_cloudwatch_metric_alarm" "bad_alarm" {
   statistic           = "Average"
   threshold           = 80
 
-  # FAIL: alarm_actions intentionally left empty
+  alarm_actions             = [] # FAIL: empty
+  ok_actions                = [] # FAIL: empty
+  insufficient_data_actions = [] # FAIL: empty
 }
